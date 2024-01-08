@@ -27,4 +27,10 @@ describe("Product Controller Create", () => {
     productController.createProduct(req, res, next);
     expect(productModel.create).toBeCalledWith(newProduct);
   });
+
+  it("should return 201 response code", () => {
+    productController.createProduct(req, res, next);
+    expect(res.statusCode).toBe(201);
+    expect(res._isEndCalled()).toBeTruthy(); // _isEndCalled()는 res.send()가 호출되었는지를 확인하는 함수 (node-mocks-http의 기능)
+  });
 });
