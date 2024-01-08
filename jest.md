@@ -47,3 +47,8 @@ expect(mockFunction).toBeCalledTimes(2);
 request, response 객체 얻기
 
 - node-mocks-http 사용
+
+---
+
+beforeEach
+: 여러 개의 테스트에 공통된 코드가 있을 때, beforeEach 안에 넣어서 반복을 줄일 수 있음
