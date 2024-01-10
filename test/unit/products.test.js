@@ -10,7 +10,7 @@ let req, res, next;
 beforeEach(() => {
   req = httpMocks.createRequest();
   res = httpMocks.createResponse();
-  next = null;
+  next = jest.fn();
 });
 
 describe("Product Controller Create", () => {
@@ -38,5 +38,13 @@ describe("Product Controller Create", () => {
     productModel.create.mockReturnValue(newProduct);
     await productController.createProduct(req, res, next);
     expect(res._getJSONData()).toStrictEqual(newProduct); // _getJSONData()는 전달된 데이터를 확인하는 함수 (node-mocks-http의 기능)
+  });
+
+  it("should handle errors", async () => {
+    const errorMessage = { message: "description property missing" };
+    const rejectedPromise = Promise.reject(errorMessage);  // 비동기 요청에 대한 결과 값은 성공할 때는 Promise.resolve(value), 에러일 때는 Promise.reject(reason)
+    productModel.create.mockReturnValue(rejectedPromise);
+    await productController.createProduct(req, res, next);
+    expect(next).toBeCalledWith(errorMessage);  // next 함수가 에러 메시지를 인자로 호출되었는지 확인
   });
 });
