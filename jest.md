@@ -72,3 +72,5 @@ supertest를 사용해 통합테스트를 하려고 함
 - supertest : nodejs http 서버를 테스트하기 위해 만들어진 모듈
 
 ---
+
+vscode extension - jest runner 설치하면 테스트 코드 하나씩 실행해볼 수 있음

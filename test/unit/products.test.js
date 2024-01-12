@@ -2,8 +2,10 @@ const productController = require("../../controller/product");
 const productModel = require("../../models/Product");
 const httpMocks = require("node-mocks-http");
 const newProduct = require("../data/new-product.json");
+const allProducts = require("../data/all-product.json");
 
 productModel.create = jest.fn(); // 이렇게 하면 productModel의 create 함수가 실제로 호출되었는지 안되었는지를 spy 할 수 있음
+productModel.find = jest.fn();
 
 let req, res, next;
 // 모든 테스트 전에 실행되는 beforeEach
@@ -46,5 +48,41 @@ describe("Product Controller Create", () => {
     productModel.create.mockReturnValue(rejectedPromise);
     await productController.createProduct(req, res, next);
     expect(next).toBeCalledWith(errorMessage);  // next 함수가 에러 메시지를 인자로 호출되었는지 확인
+  });
+});
+
+describe("ProductController Get", () => {
+  it("should have a getProducts function", () => {
+    expect(typeof productController.getProducts).toBe("function");
+  });
+
+  it("should call Product.find({})", async () => {
+    await productController.getProducts(req, res, next);
+    
+    expect(productModel.find).toHaveBeenCalledWith({});
+  })
+
+  it("should return 200 response", async () => {
+    await productController.getProducts(req, res, next);
+    
+    expect(res.statusCode).toBe(200);
+    expect(res._isEndCalled).toBeTruthy();
+  });
+
+  it("should return json body in response", async () => {
+    productModel.find.mockReturnValue(allProducts);
+    await productController.getProducts(req,res,next);
+    
+    expect(res._getJSONData).toStrictEqual(allProducts);
+  });
+
+  it("should handle errors", async () => {
+    const errorMessage = { message: "Error finding product data" };
+    const rejectedPromise = Promise.reject(errorMessage);
+
+    productController.find.mockReturnValue(rejectedPromise);
+    await productController.getProducts(req, res, next);
+
+    expect(next).toBeCalledWith(errorMessage);
   });
 });
