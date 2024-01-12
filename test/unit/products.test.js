@@ -6,8 +6,10 @@ const allProducts = require("../data/all-product.json");
 
 productModel.create = jest.fn(); // 이렇게 하면 productModel의 create 함수가 실제로 호출되었는지 안되었는지를 spy 할 수 있음
 productModel.find = jest.fn();
+productModel.findById = jest.fn();
 
 let req, res, next;
+const productId = "dfadfadf89dflkjal";
 // 모든 테스트 전에 실행되는 beforeEach
 beforeEach(() => {
   req = httpMocks.createRequest();
@@ -56,7 +58,7 @@ describe("ProductController Get", () => {
     expect(typeof productController.getProducts).toBe("function");
   });
 
-  it("should call Product.find({})", async () => {
+  it("should call ProductModel.find({})", async () => {
     await productController.getProducts(req, res, next);
     
     expect(productModel.find).toHaveBeenCalledWith({});
@@ -84,5 +86,45 @@ describe("ProductController Get", () => {
     await productController.getProducts(req, res, next);
 
     expect(next).toBeCalledWith(errorMessage);
+  });
+});
+
+describe("Product Controller GetById", () => {
+  it("should have a getProductById", () => {
+    expect(typeof productController.getProductById).toBe("function");
+  });
+
+  it("should call ProductModel.findById", async () => {
+    req.params.productId = productId;
+    await productController.getProductById(req, res, next);
+
+    expect(productModel.findById).toBeCalledWith(productId);
+  });
+
+  it("should return json body and response code 200", async () => {
+    productModel.findById.mockReturnValue(newProduct);
+    await productController.getProductById(req, res, next);
+
+    expect(res.statusCode).toBe(200);
+    expect(res._getJSONData()).toStrictEqual(newProduct);
+    expect(res._isEndCalled()).toBeTruthy();
+  });
+
+  it("should return 404 when item doesn't exist", async ()=> {
+    productModel.findById.mockReturnValue(null);
+    await productController.getProductById(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res._isEndCalled()).toBeTruthy();
+  });
+
+  it("should handle errors", async () => {
+    const errorMessage = {message: "error"};
+    const rejectedPromise = Promise.reject(errorMessage);
+
+    productModel.findById.mockReturnValue(rejectedPromise);
+
+    await productController.getProductById(req, res, next);
+    expect(next).toHaveBeenCalledWith(errorMessage);
   });
 });

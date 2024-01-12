@@ -17,3 +17,15 @@ exports.getProducts = async (req, res, next) => {
     next(err);
   }
 }
+
+exports.getProductById = async (req, res, next) => {
+  try {
+    const product = await productModel.findById(req.params.productId);
+    if(!product) {
+      res.status(404).send();
+    }
+    res.status(200).json(product);
+  } catch(err) {
+    next(err);
+  }
+};
