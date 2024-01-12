@@ -22,3 +22,12 @@ it("should return 500 on POST /api/products", async () => {
     expect(response.statusCode).toBe(500);
     expect(response.body).toStrictEqual({message: "Product validation failed: description: Path `description` is required."})
 });
+
+it("GET /api/products", async () => {
+  const response = await request(app).get("/api/products");
+
+  expect(response.statusCode).toBe(200);
+  expect(Array.isArray(response.body)).toBeTruthy();  // value가 true인지 확인
+  expect(response.body[0].name).toBeDefined();  // 변수가 undefined가 아닌지 확인
+  expect(response.body[0].description).toBeDefined();
+});
