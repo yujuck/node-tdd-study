@@ -7,9 +7,12 @@ const allProducts = require("../data/all-product.json");
 productModel.create = jest.fn(); // 이렇게 하면 productModel의 create 함수가 실제로 호출되었는지 안되었는지를 spy 할 수 있음
 productModel.find = jest.fn();
 productModel.findById = jest.fn();
+productModel.findByIdAndUpdate = jest.fn();
 
 let req, res, next;
 const productId = "dfadfadf89dflkjal";
+const updatedProduct = { name: "updated name", description: "updated description" };
+
 // 모든 테스트 전에 실행되는 beforeEach
 beforeEach(() => {
   req = httpMocks.createRequest();
@@ -126,5 +129,33 @@ describe("Product Controller GetById", () => {
 
     await productController.getProductById(req, res, next);
     expect(next).toHaveBeenCalledWith(errorMessage);
+  });
+});
+
+describe("Product Controller Update", () => {
+  it("should have an updateProduct function", () => {
+    expect(typeof productController.updateProduct).toBe("function");
+  });
+
+  it("should call ProductModel.findByIdAndUpdate", async () => {
+    req.params.productId = productId;
+    req.body = updatedProduct;
+    await productController.updateProduct(req, res, next);
+
+    expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      productId, updatedProduct,
+      {new: true}
+    );
+  });
+
+  it("should return json body and response code 200", async () => {
+    req.params.productId = productId;
+    req.body = updatedProduct;
+    productModel.findByIdAndUpdate.mockReturnValue(updatedProduct);
+    await productController.updateProduct(req, res, next);
+    
+    expect(res._isEndCalled()).toBeTruthy();
+    expect(res.statusCode).toBe(200);
+    expect(res._getJSONData()).toStrictEqual(updatedProduct);
   });
 });

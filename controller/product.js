@@ -29,3 +29,11 @@ exports.getProductById = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.updateProduct = async (req, res, next) => {
+  const updatedProduct = await productModel.findByIdAndUpdate(
+    req.params.productId, req.body, 
+    { new: true }
+  );
+  res.status(200).json(updatedProduct);
+}
