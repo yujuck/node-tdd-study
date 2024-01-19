@@ -49,3 +49,13 @@ it("GET id doesn't exist /api/products/:productId", async () => {
 
   expect(response.statusCode).toBe(404);
 })
+
+it("PUT /api/products", async () => {
+  const res = await request(app)
+    .put(`/api/products/${firstProduct._id}`)
+    .send({name: "updated name", description: "updated description"});
+
+  expect(res.statusCode).toBe(200);
+  expect(res.body.name).toBe("updated name");
+  expect(res.body.description).toBe("updated description");
+})
