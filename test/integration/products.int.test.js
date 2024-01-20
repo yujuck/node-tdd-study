@@ -59,3 +59,11 @@ it("PUT /api/products", async () => {
   expect(res.body.name).toBe("updated name");
   expect(res.body.description).toBe("updated description");
 })
+
+it("should return 404 on PUT /api/products", async () => {
+  const res = await request(app)
+    .put(`/api/products/5f9f9f9f9f9f9f9f9f9f9f11`)
+    .send({name: "updated name", description: "updated description"});
+  
+    expect(res.statusCode).toBe(404);
+})
